@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title></title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+            * {
+                border: 0;
+                padding: 0;
+                margin: 0;
+                outline: none;
+                user-select: none;
+                font-family: "Outfit", serif;
+                font-optical-sizing: auto;
+            }
+            html, body {
+                overflow: hidden;
+                color: #111111;
+                background-color: #FFFFFF;
+                -webkit-tap-highlight-color: transparent;
+            }
+            .tab {
+                display: none;
+            }
+            .tab#library-tab {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                padding: 0px 20px;
+                padding-top: calc(20px - (20px/1.5));
+                overflow: auto;
+            }
+            .tab#library-tab span:not(ul li span) {
+                display: block;
+                font-size: calc(15px * 1.5);
+                font-weight: 700;
+                margin: calc(20px/1.5) calc(15px/4);
+                text-align: left;
+            }
+            .tab#library-tab ul#library-standalone {
+                list-style-type: none;
+                display: flex;
+                flex-wrap: wrap;
+                padding: calc(-15px/2) calc(-15px/4)
+            }
+            .tab#library-tab ul#library-standalone li {
+                width: calc(50% - ((15px/4) * 2));
+                font-size: calc(15px/1.125);
+                margin: calc(15px/4);
+            }
+            .tab#library-tab ul#library-standalone li img {
+                width: 100%;
+                border-radius: calc(15px/2);
+            }
+            .tab#library-tab ul#library-standalone li .info {
+                padding: calc(15px/4) 0px;
+            }
+            .tab#library-tab ul#library-standalone li a {
+                text-decoration: none;
+                color: #111111;
+            }
+            .tab#library-tab ul li .info h1 {
+                font-size: calc(15px * 1.125);
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+            }
+            .tab#library-tab ul#library-series li {
+                border-radius: calc(15px/2);
+                overflow: hidden;
+            }
+            .tab#library-tab ul#library-series li .info {
+                padding: calc(15px/4);
+                display: flex;
+                align-items: center;
+                justify-content: left;
+                font-size: calc(15px/1.125 * 1.1);
+                line-height: calc(15px/1.125 * 1.1 * 1.375)
+            }
+            .tab#library-tab ul#library-series li .info h1 {
+                font-size: calc(15px * 1.125 * 1.1)
+            }
+            .tab#library-tab ul#library-series li .info img {
+                width: calc(100%/5);
+                margin-right: calc((100%/5)/3.5);
+                aspect-ratio: 1;
+                border-radius: calc(15px/2);
+            }
+            .tab#library-tab ul#library-series li ul {
+                list-style-type: none;
+                margin-top: calc(-15px/4);
+                height: 0px;
+                opacity: 0;
+            }
+            .tab#library-tab ul#library-series li ul li {
+                margin: calc(15px/4);
+                border-radius: calc(15px/2);
+                width: calc(100% - ((15px/4) * 2));
+                font-size: calc(15px/1.125);
+                background-color: rgba(255, 255, 255, 0.01);
+            }
+            .tab#library-tab ul#library-series li ul li a {
+                display: block;
+                padding: calc(15px/1.5);
+                text-decoration: none;
+                color: #FFFFFF;
+            }
+            .tab#library-tab ul#library-series li ul li h1 {
+                font-size: calc(15px * 1.125)
+            }
+            .tab#library-tab ul#library-series li.active {
+                background-color: #111111;
+                color: #FFFFFF;
+                margin: calc(15px/4);
+            }
+            .tab#library-tab ul#library-series li.active .info {
+                padding: calc(15px/2);
+                font-size: calc(15px/1.125);
+            }
+            .tab#library-tab ul#library-series li.active .info h1 {
+                font-size: calc(15px * 1.125);
+                line-height: calc(15px/1.125 * 1.375)
+            }
+            .tab#library-tab ul#library-series li.active ul {
+                margin-top: calc(-15px/2);
+                height: auto;
+                opacity: 1;
+            }
+            .tab#library-tab ul#library-series li.active ul li {
+                margin: calc(15px/2);
+                width: calc(100% - ((15px/2) * 2));
+            }
+            .tab#sermon-tab {
+                position: absolute;
+                top: 0;
+                left: 0;
+                bottom: 0;
+                right: 0;
+                overflow: auto;
+            }
+            .tab#sermon-tab .heading {
+                display: flex;
+                align-items: center;
+                justify-content: left;
+                background-color: #FFFFFF;
+                height: 60px;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 10000;
+                box-shadow: 0px 0px 1.25px rgba(0, 0, 0, 0.125)
+            }
+            .tab#sermon-tab .heading button, .tab#sermon-tab .heading a {
+                margin: 0px calc((60px - (60px/3))/2);
+                background-color: rgba(0, 0, 0, 0);
+                text-decoration: none;
+                color: #111111;
+            }
+            .tab#sermon-tab .heading button i, .tab#sermon-tab .heading a i {
+                font-size: calc(60px/3);
+                line-height: calc(60px/3);
+            }
+            .tab#sermon-tab .heading span {
+                width: calc(90% - 60px);
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                font-size: calc(60px/3.125);
+                line-height: calc((60px/3.125) * 1.25);
+            }
+            .tab#sermon-tab .banner {
+                aspect-ratio: 16/9;
+                background-size: cover;
+                position: relative;
+                margin-top: 60px;
+            }
+            .tab#sermon-tab .banner .overlay {
+                position: absolute;
+                bottom: -1px;
+                left: 0;
+                right: 0;
+            }
+            .tab#sermon-tab .banner .overlay .info {
+                background-color: #FFFFFF;
+                padding: 20px;
+                padding-top: calc(20px + 1px);
+            }
+            .tab#sermon-tab .banner .overlay h1 {
+                font-size: calc(15px * 1.5);
+                line-height: calc((15px * 1.5)/1.1);
+                font-weight: 600;
+                margin-bottom: calc(15px/4)
+            }
+            .tab#sermon-tab .section#sermon-viewer {
+                width: calc(100% - (20px * 2));
+                margin: 0px 20px;
+                font-size: calc(15px * 1.125);
+                overflow: auto;
+                margin-top: calc(-20px/1.5);
+                margin-bottom: 50px;
+                display: inline-block;
+            }
+            .tab#sermon-tab .section#sermon-editor {
+                width: calc(100% - (20px * 2));
+                margin: 0px 20px;
+                font-size: calc(15px * 1.125);
+                overflow: auto;
+                margin-bottom: 50px;
+                display: inline-block;
+                height: 100%;
+            }
+            .tab#sermon-tab .section#sermon-viewer .paragraph {
+                margin: 15px 0px;
+            }
+            .tab#sermon-tab .section#sermon-viewer .paragraph .quote {
+                padding: calc(15px/2) calc(15px/1.5);
+                background-color: #111111;
+                color: #FFFFFF;
+                font-size: calc((15px * 1.125)/1.1);
+                font-family: monospace;
+                border-radius: 5px;
+            }
+            .tab#sermon-tab .section#sermon-viewer .paragraph .bible {
+                padding: calc(15px/2/1.25) calc(15px/1.25/1.25);
+                border-radius: 5px;
+                margin-right: calc(15px/3);
+                margin-bottom: calc(15px/3);
+                font-size: calc(15px);
+                background-color: rgba(0, 0, 0, 0.05);
+                border: 1px solid rgba(0, 0, 0, 0.05)
+            }
+            .tab#sermon-tab .section#sermon-viewer .paragraph .list {
+                display: flex;
+                margin: calc(15px/2);
+            }
+            .tab#sermon-tab .section#sermon-viewer .paragraph .list i {
+                margin-right: 15px;
+                font-weight: 600;
+                font-size: calc(15px * 1.5);
+                line-height: calc(15px * 1.5);
+            }
+            .tab#sermon-tab button#sermon-toggle {
+                height: 50px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 15px;
+                background-color: #FFFFFF;
+                color: #111111;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                box-shadow: 0px 0px 2.5px rgba(0, 0, 0, 0.125)
+            }
+            .tab#sermon-tab button#sermon-toggle i {
+                font-size: calc(15px * 1.1);
+                margin-right: calc((45px - (15px * 1.1))/2)
+            }
+        </style>
+    </head>
+    <body>
+        <div class="tab" id="library-tab">
+            <span>Series</span>
+            <ul id="library-series"></ul>
+            <span>Standalone</span>
+            <ul id="library-standalone"></ul>
+        </div>
+        <div class="tab" id="sermon-tab">
+            <div class="heading">
+                <button onclick="history.back()">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <span id="sermon-heading-title"></span>
+                <a id="sermon-youtube">
+                    <i class="fa-brands fa-youtube"></i>
+                </a>
+            </div>
+            <div class="banner" id="sermon-banner">
+                <div class="overlay">
+                    <div class="info"></div>
+                </div>
+            </div>
+            <textarea style="font-family: monospace" class="section" id="sermon-editor"></textarea>
+            <div class="section" id="sermon-viewer"></div>
+            <button id="sermon-toggle"></button>
+            <div class="bible-overlay"></div>
+        </div>
+    </body>
+    <script>
+        const API = (function(){
+            indexedDB.open("sermons", 1).onupgradeneeded = async function(event) {
+                event.target.result.createObjectStore("sermons", { keyPath: "id" })
+            }
+            return {
+                selectTab(id) {
+                    tabs = document.getElementsByClassName("tab")
+                    for (var tab in tabs) {
+                        tab = tabs[tab]
+                        if (tab.className === "tab") {
+                            if (tab.id.split("-")[0] === id) {
+                                tab.style.display = "block"
+                            } else {
+                                tab.style.display = "none"
+                            }
+                        }
+                    }
+                },
+                library: {
+                    async all() {
+                        return await (await fetch("/", {
+                            method: "GET",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "Authorization": btoa(JSON.stringify({ id: "admin" }))
+                            }
+                        })).json()
+                    },
+                    async get(id) {
+                        return await (await fetch("/sermon/" + id, {
+                            method: "GET",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "Authorization": btoa(JSON.stringify({ id: "admin" }))
+                            }
+                        })).json()
+                    }
+                },
+                parse(text) {
+                    content = document.createElement("div")
+                    text.split("\n\n").filter((section) => (section.length > 0)).map((section) => {
+                        section = [section, document.createElement("div")]
+                        section[0].split("\n").filter((item) => (item.length > 0)).map((item) => {
+                            if (item.startsWith("> ")) {
+                                item = [item, document.createElement("button")]
+                                item[1].className = "bible"
+                                item[1].textContent = item[0].slice(2)
+                            } else if (item.startsWith("#")) {
+                                item = [item, document.createElement(`h${item.split("# ")[0].split("#").length + 1}`), item.split("# ")[0].split("#").length + 1]
+                                item[1].style.fontSize = 15 + (((6 - item[2])/6) * 15) + "px"
+                                item[1].style.lineHeight = ((15 + (((6 - item[2])/6) * 15)) * 1.1) + "px"
+                                item[1].textContent = item[0].split("# ").pop()
+                            } else if (item.startsWith("`") && item.endsWith("`")) {
+                                item = [item, document.createElement("div")]
+                                item[1].className = "quote"
+                                item[1].textContent = item[0].split("`")[1]
+                            } else if (item.startsWith("- ")) {
+                                item = [item, document.createElement("div")]
+                                item[1].className = "list"
+                                item[1].innerHTML = `<i>&#x2022;</i><div>${item[0].slice(2)}</div>`
+                            } else {
+                                item = [item, document.createElement("div")]
+                                item[1].textContent = item[0]
+                            }
+                            if (typeof item === "object") section[1].appendChild(item[1])
+                        })
+                        section[1].className = "paragraph"
+                        content.appendChild(section[1])
+                    })
+                    return content.innerHTML
+                }
+            }
+        })()
+        window.addEventListener("load", () => {
+            window.addEventListener("hashchange", async (event) => {
+                event.hash = JSON.parse(atob(window.location.hash.split("#")[1]))
+                if (event.hash[0] === "tab") {
+                    if (event.hash[1] === "library") {
+                        library = [{
+                            series: document.getElementById("library-series"),
+                            standalone: document.getElementById("library-standalone")
+                        }, await API.library.all()]
+                        library[0].series.innerHTML = ""
+                        library[0].standalone.innerHTML = ""
+                        library[1].series.forEach((serie) => {
+                            serie = [serie, document.createElement("li"), document.createElement("div"), document.createElement("ul")]
+                            serie[1].id = serie[0].id
+                            serie[1].className = "serie"
+                            serie[2].className = "info"
+                            serie[2].onclick = function() {
+                                series = document.getElementsByClassName("serie")
+                                for (var serie in series) {
+                                    serie = series[serie]
+                                    if (typeof serie === "object") {
+                                        if (serie.id === this.parentElement.id) {
+                                            serie.className = "serie active"
+                                        } else{
+                                            serie.className = "serie"
+                                        }
+                                    }
+                                }
+                            }
+                            serie[2].innerHTML = `
+                                <img src="/media/${btoa(serie[0].id).slice(0, 10)}?size=${Math.round(window.innerWidth/5)}x${Math.round(window.innerWidth/5)}">
+                                <div><h1>${serie[0].details.name}</h1><span>${serie[0].sermons.length} Sermons</span></div>
+                            `
+                            serie[0].sermons.forEach((sermon) => {
+                                sermon = [sermon, document.createElement("li")]
+                                sermon[1].innerHTML = `<a href="#${btoa(JSON.stringify(["tab", "sermon", sermon[0].id]))}"><h1>${sermon[0].name}</h1><span>${sermon[0].date}</span></a>`
+                                serie[3].appendChild(sermon[1])
+                            })
+                            serie[1].appendChild(serie[2])
+                            serie[1].appendChild(serie[3])
+                            library[0].series.appendChild(serie[1])
+                        })
+                        library[1].standalone.forEach((standalone) => {
+                            standalone = [standalone, document.createElement("li")]
+                            standalone[1].innerHTML = `<a href="#${btoa(JSON.stringify(["tab", "sermon", standalone[0].id]))}"><img src="/media/${btoa(standalone[0].id).slice(0, 10)}?size=${Math.round(window.innerWidth/2)}x${Math.round(window.innerWidth/2)}"><div class="info"><h1>${standalone[0].name}</h1><span>${standalone[0].date}</span></div></a>`
+                            library[0].standalone.appendChild(standalone[1])
+                        })
+                        console.log(library[1])
+                    } else if (event.hash[1] === "sermon") {
+                        sermon = [{
+                            heading: {
+                                title: document.getElementById("sermon-heading-title")
+                            },
+                            editor: [document.getElementById("sermon-editor"), null],
+                            viewer: document.getElementById("sermon-viewer"),
+                            banner: document.getElementById("sermon-banner"),
+                            youtube: document.getElementById("sermon-youtube"),
+                            toggle: document.getElementById("sermon-toggle"),
+                            mode: "edit"
+                        }, null]
+                        indexedDB.open("sermons", 1).onsuccess = function(_event) {
+                            request = _event.target.result.transaction(["sermons"], "readonly")
+                            request.objectStore("sermons").getAll().onsuccess = async function(_sermons) {
+                                if (_sermons.target.result.filter((item) => (item.id === event.hash[2])).length > 0) {
+                                    sermon[1] = _sermons.target.result.filter((item) => (item.id === event.hash[2])).pop()
+                                    console.log("retrieved from storage")
+                                } else {
+                                    sermon[1] = await API.library.get(event.hash[2])
+                                    _event.target.result.transaction(["sermons"], "readwrite").objectStore("sermons").add(sermon[1])
+                                }
+                                sermon[0].editor[0].value = sermon[1].content
+                                sermon[0].banner.innerHTML = `<div class="overlay"><div></div><div class="info"><h1>${sermon[1].name}</h1><span>${sermon[1].date}<b style="margin: 0px 5px">&#x2022;</b>${sermon[1].speaker}</span></div></div>`
+                                sermon[0].banner.style.backgroundImage = `url("/media/${btoa(sermon[1].series ? sermon[1].series : sermon[1].id).slice(0, 10)}?size=${window.innerWidth}x${parseInt(window.innerWidth/16 * 9)}")`
+                                sermon[0].heading.title.textContent = sermon[1].name
+                                sermon[0].toggle.onclick = function() {
+                                    if (sermon[0].mode === "edit") {
+                                        this.innerHTML = `<i class="fa-solid fa-book-open"></i> Reading Mode`
+                                        sermon[0].editor[0].style.display = "none"
+                                        sermon[0].viewer.style.display = "block"
+                                        sermon[0].viewer.innerHTML = API.parse(sermon[0].editor[0].value)
+                                        sermon[0].mode = "view"
+                                    } else {
+                                        this.innerHTML = `<i class="fa-solid fa-i-cursor"></i> Editing Mode`
+                                        sermon[0].editor[0].style.display = "block"
+                                        sermon[0].viewer.style.display = "none"
+                                        sermon[0].editor[0].style.height = sermon[0].editor[0].scrollHeight + 15 + "px"
+                                        sermon[0].mode = "edit"
+                                    }
+                                    console.log(sermon[0].mode)
+                                }
+                                sermon[0].editor[0].addEventListener("input", (editor) => {
+                                    if (sermon[0].mode === "edit") {
+                                        if (sermon[0].editor[1]) clearTimeout(sermon[0].editor[1])
+                                        else sermon[0].toggle.innerHTML = "Saving..."
+                                        sermon[0].editor[1] = setTimeout(function(){
+                                            sermon[1].content = sermon[0].editor[0].value
+                                            _event.target.result.transaction(["sermons"], "readwrite").objectStore("sermons").put(sermon[1])
+                                            sermon[0].toggle.innerHTML = "Saved."
+                                        }, 2500)
+                                    }
+                                })
+                                sermon[0].banner.style.backgroundPosition = `50% ${(sermon[0].banner.getElementsByClassName("info")[0].offsetHeight)/2 * -1}px`
+                                sermon[0].youtube.href = `https://www.youtube.com/watch?v=${sermon[1].id}`
+                                sermon[0].toggle.click()
+                            }
+                        }
+                    }
+                    API.selectTab(event.hash[1])
+                }
+            })
+            window.location.hash = "#" + btoa(JSON.stringify(["tab", "library"]))
+        })
+    </script>
+</html>
